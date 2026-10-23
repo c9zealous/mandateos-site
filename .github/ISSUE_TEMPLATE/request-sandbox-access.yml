@@ -1,0 +1,43 @@
+name: Request sandbox access
+description: Ask for MandateOS sandbox access for the agent you are building.
+title: "Sandbox access: [your agent / project name]"
+labels: ["sandbox-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Heads up: GitHub issues are public.** Fill this in with only the contact details you are comfortable making public. Do not paste credentials, keys, or anything confidential.
+  - type: input
+    id: agent
+    attributes:
+      label: What your agent does, in one line
+      description: For example, "Reorders groceries for users inside a budget they set."
+      placeholder: One line is enough.
+    validations:
+      required: true
+  - type: dropdown
+    id: money_status
+    attributes:
+      label: Does your agent move real money in India today?
+      options:
+        - "Yes"
+        - "Launching within 90 days"
+        - "Not yet"
+    validations:
+      required: true
+  - type: textarea
+    id: payment_setup
+    attributes:
+      label: Current payment setup
+      description: Which PSP, which rail, and how do approvals work today? "None yet" is a fine answer.
+      placeholder: PSP / rail / approvals today
+    validations:
+      required: false
+  - type: input
+    id: contact
+    attributes:
+      label: How should we reach you?
+      description: An email, a LinkedIn or X handle, or another public contact you are comfortable posting here. (Public — see the note above.)
+      placeholder: e.g. you@yourcompany.in
+    validations:
+      required: true

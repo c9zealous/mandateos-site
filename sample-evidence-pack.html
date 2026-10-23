@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample dispute evidence pack — MandateOS</title>
+<meta name="description" content="A real MandateOS dispute evidence pack, generated from sandbox data: the mandate as consented, the full decision chain, the approval record, and the execution reference, hash-linked.">
+<style>
+:root{
+  --paper:#faf8f3; --ink:#1c1a16; --ink-soft:#4a463e; --rule:#d8d2c4;
+  --accent:#8c3a1d; --max:44rem;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:1.0625rem;line-height:1.65}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 1.25rem}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{text-decoration-thickness:2px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+h1,h2{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-weight:600;letter-spacing:-.01em}
+header{padding:2.5rem 0 1.5rem;border-bottom:2px solid var(--ink)}
+.wordmark{font-family:Georgia,"Iowan Old Style",serif;font-size:1.05rem;letter-spacing:.14em;text-transform:uppercase}
+.wordmark span{color:var(--accent)}
+h1{font-size:1.9rem;line-height:1.22;margin:1.6rem 0 .8rem}
+h2{font-size:1.35rem;line-height:1.25;margin:2rem 0 .8rem}
+p{margin:.7rem 0}
+blockquote{margin:1rem 0;padding:.6rem 1rem;border-left:3px solid var(--accent);background:#fff;color:var(--ink)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.84em;
+  background:#efeadf;padding:.08em .32em;border-radius:2px;overflow-wrap:anywhere}
+ul{margin:.6rem 0;padding-left:1.2rem}
+li{margin:.4rem 0}
+footer{padding:2rem 0 3.5rem;color:var(--ink-soft);font-size:.9rem;border-top:1px solid var(--rule);margin-top:2.5rem}
+@media (max-width:560px){ h1{font-size:1.55rem} h2{font-size:1.2rem} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="wordmark">Mandate<span>OS</span></p>
+  <p><a href="index.html">&larr; Back to the MandateOS page</a></p>
+  <h1>MandateOS dispute evidence pack</h1>
+  <p>This is the full pack the <a href="index.html#s5">main page</a> excerpts in &sect;5, reproduced in full. The <a href="sample-evidence-pack.md">raw Markdown file</a> is the generated artefact itself, byte for byte.</p>
+</header>
+
+<main>
+<blockquote><strong>Sandbox data.</strong> This pack was generated from the MandateOS sandbox (simulated rail, test accounts). It demonstrates the format a production pack takes; it is not evidence of a real payment.</blockquote>
+
+<ul>
+  <li>Payment intent: <code>pin_b250daee0490484684effd80efb064f1</code></li>
+  <li>Generated at: 2026-10-23T11:33:00.000Z</li>
+  <li>Pack version: 1.0</li>
+  <li>Bundle hash (SHA-256): <code>3e6be4e42ca4f0570ebd034bd8bf52f29e7f5c7aae7b1fa71e053b11f1440d66</code></li>
+</ul>
+
+<h2>Summary verdict</h2>
+<p>The agent attempted a payment of <strong>&#8377;2,600</strong> (260000 paise) to <strong>Blinkit</strong>. Final policy decision: <strong>ALLOW</strong>; payment status: <strong>SUCCEEDED</strong>.</p>
+<p>Reason codes:</p>
+<ul>
+  <li><code>IN_SCOPE_AFTER_APPROVAL</code> &mdash; The user approved this payment, and on re-check it was inside the mandate's scope.</li>
+</ul>
+
+<h2>What was authorized</h2>
+<p>Mandate <code>mnd_be02f9027664407aa22e8a2062acda30</code> &mdash; purpose: Weekly groceries and household staples. Status at pack time: ACTIVE.</p>
+<ul>
+  <li>Per-payment cap: &#8377;5,000</li>
+  <li>Daily cap: &#8377;15,000</li>
+  <li>Monthly cap: &#8377;15,000</li>
+  <li>Ask-first threshold: &#8377;5,000; approval mode: SILENT_WITHIN_SCOPE</li>
+  <li>Categories: GROCERIES</li>
+  <li>Merchant allowlist: mrc_bigbasket, mrc_blinkit</li>
+  <li>Valid: 2026-10-01T00:00:00.000Z to 2027-03-31T00:00:00.000Z</li>
+</ul>
+<p>Consent: the user consented on 2026-10-22T10:00:00.000Z via HOSTED_CONSENT_PAGE; consent text hash <code>46f4edc45da484deab3c4730d74d5144bdedeaada236ed2363945aa5ba07fcf8</code>; rail consent reference <code>consent_mnd_be02f9027664407aa22e8a2062acda30</code>.</p>
+<p>Agent: Kirana Agent (<code>agt_2e541fe20e424743a1972c704e42bfb8</code>), developer account <code>dev_local</code>, attestation level <strong>L0_SELF_ASSERTED</strong>, signing-key fingerprint <code>2722f1c198adffb899fd7f0644900717f6579101164b92a96754cd39bfd380d7</code>. User: Priya (<code>usr_priya</code>).</p>
+
+<h2>What happened</h2>
+<p>Policy decisions, in order:</p>
+<ul>
+  <li><strong>STEP_UP</strong> at 2026-10-23T11:33:00.000Z &mdash; <code>FIRST_TXN_FOR_MERCHANT</code> (This is the first payment to this merchant under the mandate, so the user must approve it.) (policy version 1.0.0, inputs hash <code>60572a6b6e0a80f5d251f153c4eb6e8321c4e06b0854b1dab8aec912b49023b0</code>, ledger seq 22)</li>
+  <li><strong>ALLOW</strong> at 2026-10-23T11:33:00.000Z &mdash; <code>IN_SCOPE_AFTER_APPROVAL</code> (The user approved this payment, and on re-check it was inside the mandate's scope.) (policy version 1.0.0, inputs hash <code>374bfa5a448127026fc93f458b1bbcf07d4a4901d35255261ad20b6e8ca936da</code>, ledger seq 25)</li>
+</ul>
+<p>Approval: request <code>apr_343442bacc3d4629809811a0095c0930</code> asked the user to confirm <strong>&#8377;2,600</strong> to <strong>Blinkit</strong> via PUSH. Status: <strong>APPROVED</strong>, decided at 2026-10-23T11:33:00.000Z via IN_APP by user <code>usr_priya</code>.</p>
+<p>Execution: rail <strong>SANDBOX_UPI</strong>, external reference <code>sbx_txn_7</code>, UPI reference <code>1000000000007</code>; final status SUCCEEDED.</p>
+
+<h2>Timeline</h2>
+<ul>
+  <li>seq 1 &middot; 2026-10-22T10:00:00.000Z &middot; <strong>MANDATE_CREATED</strong> &middot; actor DEVELOPER:dev_local &middot; entry hash <code>b13f8f970baa3e14&hellip;</code></li>
+  <li>seq 2 &middot; 2026-10-22T10:00:00.000Z &middot; <strong>MANDATE_CONSENTED</strong> &middot; actor USER:usr_priya &middot; entry hash <code>c263d92b34da7db3&hellip;</code></li>
+  <li>seq 3 &middot; 2026-10-22T10:00:00.000Z &middot; <strong>MANDATE_ACTIVATED</strong> &middot; actor USER:usr_priya &middot; entry hash <code>b6d920fe4c575294&hellip;</code></li>
+  <li>seq 22 &middot; 2026-10-23T11:33:00.000Z &middot; <strong>POLICY_DECISION</strong> &middot; actor SYSTEM:policy-engine &middot; entry hash <code>ec95c1612aabcdf2&hellip;</code></li>
+  <li>seq 23 &middot; 2026-10-23T11:33:00.000Z &middot; <strong>APPROVAL_REQUESTED</strong> &middot; actor AGENT:agt_2e541fe20e424743a1972c704e42bfb8 &middot; entry hash <code>3e35a508d67c801f&hellip;</code></li>
+  <li>seq 24 &middot; 2026-10-23T11:33:00.000Z &middot; <strong>APPROVAL_DECIDED</strong> &middot; actor USER:usr_priya &middot; entry hash <code>2986b2bc0394fd88&hellip;</code></li>
+  <li>seq 25 &middot; 2026-10-23T11:33:00.000Z &middot; <strong>POLICY_DECISION</strong> &middot; actor SYSTEM:policy-engine &middot; entry hash <code>47046abeab2deccb&hellip;</code></li>
+  <li>seq 26 &middot; 2026-10-23T11:33:00.000Z &middot; <strong>EXECUTION_SUBMITTED</strong> &middot; actor SYSTEM:api-mcp &middot; entry hash <code>6486dfa54aca7482&hellip;</code></li>
+  <li>seq 27 &middot; 2026-10-23T11:33:00.000Z &middot; <strong>EXECUTION_SUCCEEDED</strong> &middot; actor SYSTEM:api-mcp &middot; entry hash <code>46e8d7347a644468&hellip;</code></li>
+</ul>
+
+<h2>Verification</h2>
+<ul>
+  <li>Ledger chain: <strong>valid</strong>. The user's full hash chain (28 entries) was re-verified at generation time; this pack includes the 9 entries that reference this intent, its approval, and its mandate (seq numbers are shown, so entries belonging to other payments appear as gaps).</li>
+  <li>Bundle hash: <code>3e6be4e42ca4f0570ebd034bd8bf52f29e7f5c7aae7b1fa71e053b11f1440d66</code> &mdash; SHA-256 over the canonical JSON of the pack contents. Recomputing it over the JSON form of this pack detects any later edit.</li>
+  <li>Attestation limit: this pack is <strong>not server-signed</strong> (v1). The hashes prove the pack is internally consistent and that the ledger chain was intact when the pack was generated; they do not by themselves prove MandateOS issued the pack.</li>
+</ul>
+</main>
+
+<footer>
+  <p><a href="index.html">&larr; Back to the MandateOS page</a> &middot; Generated from the MandateOS sandbox, 2026-10-23. Sandbox data; not evidence of a real payment.</p>
+</footer>
+</div>
+</body>
+</html>

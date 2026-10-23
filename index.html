@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MandateOS — Authorization and control for AI-agent payments in India</title>
+<meta name="description" content="MandateOS is a developer-first authorization layer for AI-agent payments in India: scoped user mandates, ALLOW / STEP_UP / DENY policy decisions with reason codes, and a hash-chained audit ledger. It never touches funds. Sandbox stage.">
+<style>
+:root{
+  --paper:#faf8f3; --ink:#1c1a16; --ink-soft:#4a463e; --rule:#d8d2c4;
+  --accent:#8c3a1d; --code-bg:#171512; --code-ink:#e9e4d8; --code-dim:#9d968a;
+  --max:44rem;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:1.0625rem;line-height:1.65}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 1.25rem}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{text-decoration-thickness:2px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+h1,h2{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-weight:600;letter-spacing:-.01em}
+header{padding:3.5rem 0 2rem;border-bottom:2px solid var(--ink)}
+.wordmark{font-family:Georgia,"Iowan Old Style",serif;font-size:1.05rem;letter-spacing:.14em;text-transform:uppercase}
+.wordmark span{color:var(--accent)}
+.statusline{color:var(--ink-soft);font-size:.9rem;margin-top:.4rem}
+h1{font-size:2.35rem;line-height:1.18;margin:2.2rem 0 1rem}
+.lede{font-size:1.15rem;color:var(--ink)}
+main{padding-bottom:1rem}
+section{padding:2.4rem 0 .4rem;border-bottom:1px solid var(--rule)}
+.secnum{font-size:.8rem;letter-spacing:.18em;color:var(--accent);text-transform:uppercase;margin:0}
+h2{font-size:1.55rem;line-height:1.25;margin:.35rem 0 1rem}
+h3{font-size:1.05rem;margin:1.6rem 0 .4rem}
+p{margin:.7rem 0}
+.small{font-size:.92rem;color:var(--ink-soft)}
+.footnote{font-size:.88rem;color:var(--ink-soft);border-top:1px dotted var(--rule);padding-top:.6rem;margin-top:1.2rem}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em;
+  background:#efeadf;padding:.08em .32em;border-radius:2px}
+pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  background:var(--code-bg);color:var(--code-ink);font-size:.8rem;line-height:1.6;
+  padding:1.1rem 1.2rem;overflow-x:auto;border-radius:3px;margin:1rem 0}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+pre .dim{color:var(--code-dim)}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.95rem}
+th,td{text-align:left;vertical-align:top;padding:.5rem .7rem .5rem 0;border-bottom:1px solid var(--rule)}
+th{font-weight:600;border-bottom:2px solid var(--ink)}
+td.f{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;white-space:nowrap}
+ul.plain{margin:.6rem 0;padding-left:1.2rem}
+ul.plain li{margin:.35rem 0}
+.cmdrow{display:flex;align-items:stretch;gap:0;margin:1rem 0}
+.cmdrow pre{flex:1;margin:0;border-radius:3px 0 0 3px}
+.copybtn{font:inherit;font-size:.85rem;background:var(--ink);color:var(--paper);border:0;
+  padding:0 1rem;cursor:pointer;border-radius:0 3px 3px 0}
+.copybtn:hover{background:var(--accent)}
+.cta{border:1.5px solid var(--ink);padding:1.4rem 1.5rem;margin:1.4rem 0;background:#fff}
+.cta p{margin:.3rem 0}
+.btn{display:inline-block;margin-top:.8rem;background:var(--ink);color:var(--paper);
+  padding:.65rem 1.3rem;text-decoration:none;font-weight:600;border-radius:2px}
+.btn:hover{background:var(--accent)}
+footer{padding:2rem 0 3.5rem;color:var(--ink-soft);font-size:.9rem}
+@media (max-width:560px){
+  h1{font-size:1.8rem} h2{font-size:1.35rem} pre{font-size:.72rem}
+  td.f{white-space:normal}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="wordmark">Mandate<span>OS</span></p>
+  <p class="statusline">A working name &middot; Sandbox stage &middot; October 2026</p>
+  <h1>Your agent can pay. Inside limits the user set. With proof.</h1>
+  <p class="lede">MandateOS is the authorization and control layer for AI-agent payments in India. It decides, in real time, whether an agent may spend a user's money &mdash; and it writes the decision down, permanently, before any money moves.</p>
+</header>
+
+<main>
+
+<section aria-labelledby="s1">
+  <p class="secnum">01</p>
+  <h2 id="s1">What it is</h2>
+  <p>A user grants an AI agent a scoped, revocable <strong>mandate</strong>: a per-transaction cap, a daily and monthly budget, merchant and category allowlists, a validity window, and rules for when the agent must ask first. Every payment the agent attempts is evaluated by a deterministic policy engine and returns one of three decisions &mdash; <strong>ALLOW</strong>, <strong>STEP_UP</strong> (ask the user, with full context, on their phone), or <strong>DENY</strong> &mdash; each with a machine-readable reason code the agent can act on. Every grant, decision, approval and execution is written to an append-only, hash-chained ledger.</p>
+  <p>MandateOS does not move money. It holds no funds, pools nothing, settles nothing. Licensed partner PSPs and banks execute on UPI &mdash; today that means UPI Reserve Pay blocks and e-mandates / UPI Autopay &mdash; and only on a decision the ledger already records. That separation is the design, not a limitation we are working around: an agent is never an authentication factor, and no rail call happens without a committed policy decision behind it.</p>
+  <p>The control layer for agent payments exists today only inside individual PSPs' walls. What does not exist is the neutral version: one mandate and policy layer an independent agent builder can use regardless of which PSP executes, with agent identity (&ldquo;Know Your Agent&rdquo;) and a dispute-evidence record on UPI. That narrower claim is the product. Whether buyers will pay a standalone fee for neutrality is, as of this writing, untested &mdash; the pilot described in &sect;8 is the test.</p>
+</section>
+
+<section aria-labelledby="s2">
+  <p class="secnum">02</p>
+  <h2 id="s2">How a decision works</h2>
+  <p>This is the scripted demo, run against the real policy engine, ledger and approval flow. Priya has given her grocery agent a mandate: groceries only, BigBasket and Blinkit, &#8377;15,000 a month, &#8377;5,000 per transaction. &#8377;6,400 of the month's budget was already spent before the demo starts.</p>
+  <pre aria-label="Demo transcript"><code>Beat 1 &mdash; the silent allow
+  <span class="dim">&rarr;</span> request_payment(BigBasket, &#8377;3,850, GROCERIES)
+  [ledger #4] POLICY_DECISION <span class="dim">&rarr;</span> ALLOW (IN_SCOPE)
+  [ledger #6] EXECUTION_SUCCEEDED <span class="dim">&rarr;</span> rail txn sbx_txn_2
+
+Beat 2 &mdash; the step-up
+  <span class="dim">&rarr;</span> request_payment(Blinkit, &#8377;2,600, GROCERIES)
+  [ledger #7] POLICY_DECISION <span class="dim">&rarr;</span> STEP_UP (FIRST_TXN_FOR_MERCHANT)
+  [approval] &#8377;2,600 at Blinkit &middot; first payment to this merchant
+             under the mandate &middot; budget left after: &#8377;2,150 &middot; expires 10 min
+  [ledger #9] APPROVAL_DECIDED <span class="dim">&rarr;</span> APPROVED by Priya (in-app)
+  [ledger #10] POLICY_DECISION <span class="dim">&rarr;</span> ALLOW (IN_SCOPE_AFTER_APPROVAL)
+
+Beat 3 &mdash; the hard deny
+  <span class="dim">&rarr;</span> request_payment(Farmstory, &#8377;4,200, GROCERIES)
+  [ledger #13] POLICY_DECISION <span class="dim">&rarr;</span> DENY (MERCHANT_NOT_ALLOWLISTED)
+
+Finale &mdash; the kill switch
+  [ledger #14] KILL_SWITCH_ENGAGED <span class="dim">&rarr;</span> AGENT
+  <span class="dim">&rarr;</span> request_payment(BigBasket, &#8377;3,850, GROCERIES)
+  [ledger #15] POLICY_DECISION <span class="dim">&rarr;</span> DENY (KILL_SWITCH_ENGAGED)
+
+Ledger check: 15 entries, hash chain intact.</code></pre>
+  <p class="small">Disclosure, in the demo's own words: &ldquo;The rail underneath today is a simulator we wrote; the policy engine, the ledger and the approval flow are the real product code. Live execution rides a partner PSP's mandate products &mdash; that integration is what the design-partner phase is for.&rdquo; The approval in Beat 2 is decided on the user's own surface; no agent can approve its own request, and an approval is bound to exactly one amount and one merchant. It can satisfy a step-up rule. It can never enlarge the mandate.</p>
+</section>
+
+<section aria-labelledby="s3">
+  <p class="secnum">03</p>
+  <h2 id="s3">The mandate</h2>
+  <p>The mandate is the core object. These are its actual fields, from the frozen contracts (v1.3.0); amounts are integer paise, and defaults are clamped to regulatory maxima at creation.</p>
+  <table>
+    <thead><tr><th scope="col">Field</th><th scope="col">Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="f">cap_per_txn_paise</td><td>Hard ceiling per transaction. A cap breach is a DENY, never a step-up.</td></tr>
+      <tr><td class="f">cap_daily_paise</td><td>Budget over a rolling 24-hour window.</td></tr>
+      <tr><td class="f">cap_monthly_paise</td><td>Budget over a rolling 30-day window.</td></tr>
+      <tr><td class="f">merchant_allowlist</td><td>Merchants the agent may pay, bound to merchant ID or VPA &mdash; never to a display name, so lookalike names do not pass.</td></tr>
+      <tr><td class="f">categories</td><td>Permitted spend categories. The agent's declared category is checked against the merchant's registered category; an agent cannot self-certify.</td></tr>
+      <tr><td class="f">step_up_threshold_paise</td><td>Above this amount, the user approves first, even when the payment is otherwise in scope. Zero means always ask.</td></tr>
+      <tr><td class="f">approval_mode</td><td>Silent within scope, or approve every transaction.</td></tr>
+      <tr><td class="f">rail_constraints</td><td>Which rails may execute, and the mandate's no-AFA ceiling per transaction.</td></tr>
+      <tr><td class="f">valid_from / valid_until</td><td>The validity window, at most five years. Outside it, every request is denied.</td></tr>
+    </tbody>
+  </table>
+  <p>The default silent profile adopts the envelope regulators already accept for delegated UPI payments: &#8377;5,000 per transaction and &#8377;15,000 per month, taken from UPI Circle's full-delegation caps as a template.<sup>1</sup> &#8377;15,000 is also the RBI e-mandate ceiling for recurring debits without additional authentication. Above the line, the agent asks. In the demo mandate above: per-payment cap &#8377;5,000, monthly cap &#8377;15,000, allowlist of exactly two merchants.</p>
+  <p class="footnote"><sup>1</sup> UPI Circle delegates between humans, so it is a template for caps and consent design only. It is never an execution path for agents, and no mandate is registered on it.</p>
+</section>
+
+<section aria-labelledby="s4">
+  <p class="secnum">04</p>
+  <h2 id="s4">Every no has a code</h2>
+  <p>Decisions are not vibes. Each one carries a reason code from a versioned registry &mdash; 32 codes today, never repurposed, never deleted &mdash; so an agent can react programmatically and a human can debug without guessing. Evaluation runs in a fixed order: kill switch first, then actor and mandate state, merchant, category, regulatory ceiling, caps, attestation, anomaly checks, step-up rules. Six of the codes, verbatim from the registry:</p>
+  <table>
+    <thead><tr><th scope="col">Code</th><th scope="col">Decision</th><th scope="col">Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="f">IN_SCOPE</td><td>ALLOW</td><td>All checks passed; silently executable on the chosen rail.</td></tr>
+      <tr><td class="f">IN_SCOPE_AFTER_APPROVAL</td><td>ALLOW</td><td>A step-up approval completed and the payment was re-evaluated with the approval attached.</td></tr>
+      <tr><td class="f">FIRST_TXN_FOR_MERCHANT</td><td>STEP_UP</td><td>First transaction to this merchant under this mandate; the user must approve it.</td></tr>
+      <tr><td class="f">MERCHANT_NOT_ALLOWLISTED</td><td>DENY</td><td>The allowlist is non-empty and the merchant is not on it.</td></tr>
+      <tr><td class="f">CAP_PER_TXN_EXCEEDED</td><td>DENY</td><td>Amount exceeds the per-transaction cap. Caps are DENY, never STEP_UP.</td></tr>
+      <tr><td class="f">KILL_SWITCH_ENGAGED</td><td>DENY</td><td>A kill switch is engaged, at global, developer, agent or mandate scope. Checked first, and checked again at execution time.</td></tr>
+    </tbody>
+  </table>
+  <p>A DENY is terminal. No approval request is ever created for a denied payment &mdash; a user is never asked to bless something outside the scope they granted.</p>
+</section>
+
+<section aria-labelledby="s5">
+  <p class="secnum">05</p>
+  <h2 id="s5">The evidence pack</h2>
+  <p>When an agent spends inside a mandate and the user disputes it, someone has to answer a specific question: what exactly was this agent allowed to do, and what did it do? For any payment, MandateOS exports a dispute evidence pack that answers it from the record &mdash; the mandate as consented, the full decision chain, the approval record, and the execution reference, hash-linked. An excerpt from a real generated pack (the demo's Beat 2 payment, sandbox data):</p>
+  <pre aria-label="Evidence pack excerpt"><code><span class="dim">## Summary verdict</span>
+The agent attempted a payment of &#8377;2,600 to Blinkit.
+Final policy decision: ALLOW; payment status: SUCCEEDED.
+Reason: IN_SCOPE_AFTER_APPROVAL &mdash; the user approved this payment,
+and on re-check it was inside the mandate's scope.
+
+<span class="dim">## What happened</span>
+STEP_UP at 2026-10-23T11:33:00Z &mdash; FIRST_TXN_FOR_MERCHANT (ledger seq 22)
+Approval: &#8377;2,600 to Blinkit via PUSH &mdash; APPROVED by the user (seq 24)
+ALLOW at 2026-10-23T11:33:00Z &mdash; IN_SCOPE_AFTER_APPROVAL (ledger seq 25)
+Execution: rail SANDBOX_UPI, external reference sbx_txn_7
+
+<span class="dim">## Verification</span>
+Ledger chain: valid. The user's full hash chain (28 entries) was
+re-verified at generation time.</code></pre>
+  <p class="footnote">The same section of the real pack states its own limit, and so do we: packs are not server-signed in v1. The hashes prove the pack is internally consistent and that the ledger chain was intact when the pack was generated; they do not by themselves prove MandateOS issued it. Server signing is named future work, in the document itself.</p>
+</section>
+
+<section aria-labelledby="s6">
+  <p class="secnum">06</p>
+  <h2 id="s6">Measured, not asserted</h2>
+  <p>The policy engine is scored by an eval harness on every change: a golden corpus of decisions it must get right, and an adversarial suite of attacks a rogue or prompt-injected agent would try. Current scorecard, generated 2026-10-23:</p>
+  <table>
+    <thead><tr><th scope="col">Suite</th><th scope="col">Result</th></tr></thead>
+    <tbody>
+      <tr><td>Golden decision corpus</td><td><strong>95 / 95</strong> scenarios correct; every safety-gated category (caps, budgets, allowlist, attestation, kill switch, regulatory ceiling) at 100%</td></tr>
+      <tr><td>Adversarial suite</td><td><strong>10 / 10</strong> attacks blocked, including payment structuring against the monthly budget, merchant spoofing, approval replay, tampered amounts after approval, cross-mandate credential use, and a kill switch engaged mid-flight</td></tr>
+      <tr><td>Ledger integrity</td><td><strong>5 / 5</strong> scored tamper cases detected (mutated amount, deleted entry, reordered entries, forged hash)</td></tr>
+      <tr><td>Decision latency</td><td>p95 of 0.033&nbsp;ms per evaluation, in-process, over 2,790 samples</td></tr>
+    </tbody>
+  </table>
+  <p class="footnote">Two limits, stated because the scorecard states them: silently dropping the ledger's tail entry is not detectable from the chain alone &mdash; it needs an externally anchored chain head, which is not built yet. And two registry codes (an API-layer idempotency conflict and the approval rate limit) are enforced outside the engine, so the corpus does not exercise them. The scorecard was generated against contracts v1.2.0; the contracts are now at v1.3.0.</p>
+</section>
+
+<section aria-labelledby="s7">
+  <p class="secnum">07</p>
+  <h2 id="s7">Honest status</h2>
+  <h3>Real today</h3>
+  <ul class="plain">
+    <li>The policy engine, mandate lifecycle, step-up approval flow, kill switches and hash-chained ledger, running end to end.</li>
+    <li>A REST API, a native MCP server with the six agent tools, a TypeScript SDK, a developer console, and the mobile approval page.</li>
+    <li>Evidence pack export per payment, and a Razorpay adapter that runs in test mode.</li>
+    <li>The eval harness in &sect;6, in the repo, runnable by anyone with the code.</li>
+  </ul>
+  <h3>Simulated, and labelled as such</h3>
+  <ul class="plain">
+    <li>The UPI rail in the sandbox and the demo is a simulator we wrote. It exists so the full loop &mdash; mandate, decision, step-up, execution, ledger &mdash; can be exercised and attacked today.</li>
+    <li>Sandbox identity verification (the step from self-asserted L0 to L1) validates the shape of submitted evidence only. Its records say so: <code>verification_method: "SELF_ATTESTED_SANDBOX"</code>. It is not a real-world identity check.</li>
+  </ul>
+  <h3>Does not exist yet</h3>
+  <ul class="plain">
+    <li>Live UPI execution. That requires a partner PSP integration, and those conversations are the current phase. Anyone who tells you their agent layer is live and autonomous on UPI today is demoing a simulator and not saying so. We say so.</li>
+    <li>Any regulatory approval. None is claimed or implied. NPCI's Unified Agentic Protocol and agent registry are paused pending RBI sign-off; this product is built to be that protocol's policy engine if and when it is approved, and depends on it for nothing.</li>
+    <li>Production users, partner logos, testimonials. There are none, so this page shows none.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="s8">
+  <p class="secnum">08</p>
+  <h2 id="s8">For builders</h2>
+  <p>From a clone of the repository, one command takes you to your first ALLOW decision, over the public API: fresh developer account, agent registered and verified to L1, mandate consented, first payment stepped up and approved, second payment allowed silently, ledger verified.</p>
+  <div class="cmdrow">
+    <pre aria-label="Quickstart command"><code>npm run quickstart</code></pre>
+    <button class="copybtn" type="button" data-copy="npm run quickstart">Copy</button>
+  </div>
+  <p>Your agent talks to MandateOS over MCP (Streamable HTTP at <code>POST /mcp</code>) or REST. The MCP surface is exactly six tools: <code>check_mandate</code>, <code>list_my_mandates</code>, <code>request_payment</code>, <code>get_payment_status</code>, <code>request_mandate</code>, <code>cancel_payment</code>. There is deliberately no approve tool and no mandate-edit tool on the agent surface: an agent can never approve its own spend or widen its own mandate. Agent credentials are scoped per agent and per mandate, and signed; a token minted for one mandate is worthless against another.</p>
+  <p class="small">References: the code repository is private during the design-partner phase, and the SDK guide (<code>@mandateos/sdk</code>, with runnable examples) ships inside it. Public for now: the <a href="sample-evidence-pack.html">sample evidence pack</a> from &sect;5, also available as the <a href="sample-evidence-pack.md">raw Markdown file</a>. The hosted sandbox with self-serve keys is the next build item; until it ships, sandbox access comes with the pilot call below.</p>
+</section>
+
+<section aria-labelledby="s9">
+  <p class="secnum">09</p>
+  <h2 id="s9">The proposed standard</h2>
+  <p>The object that matters in agent payments is not the credential. It is the mandate. We have drafted the mandate object, its lifecycle, its decision vocabulary and its mappings to AP2, Visa's Trusted Agent Protocol and Mastercard's Verifiable Intent as a proposed open standard, so the format outlives any one vendor &mdash; including us.</p>
+  <p>It is a proposal by an independent developer, currently in preparation for publication. It is not issued by, endorsed by, or affiliated with NPCI, the Reserve Bank of India, or any payment network, and nothing in it authorizes anyone to move money. Read the draft &mdash; forthcoming; it will be published here when it is ready.</p>
+</section>
+
+<section aria-labelledby="s10">
+  <p class="secnum">10</p>
+  <h2 id="s10">The pilot, priced plainly</h2>
+  <p>We are taking on three design partners. The first phase is a four-week sandbox phase, free. After that, the paid pilot is one of two structures, your choice:</p>
+  <ul class="plain">
+    <li><strong>&#8377;25,000 flat for 3 months</strong>, or</li>
+    <li><strong>&#8377;4,999 per month per production agent</strong>.</li>
+  </ul>
+  <p>You get a named engineer on our side (the founder), a weekly feedback call, and success criteria written down before the pilot starts. No lock-in language, no surprise tiers. The pilot converts to production only when a partner execution path exists for your use case; if your agent needs cards or cross-border payments, this is not your product yet, and we would rather say that here than on a call.</p>
+  <div class="cta">
+    <p><strong>Book a 20-minute pilot call.</strong></p>
+    <p class="small">The call is the application. If the price is wrong for what this is worth to you, the call is exactly where to say so &mdash; the pricing above is a hypothesis we are testing, and the point of the conversation is to test it. A signup count is not what we are measuring; booked calls with people actually building agents that pay in India are.</p>
+    <p class="small">For now the request opens as a short form on GitHub. Issues there are public, so include only contact details you are comfortable making public; we reply and schedule the call from there.</p>
+    <a class="btn" href="https://github.com/c9zealous/mandateos-site/issues/new/choose">Book the call</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>Built by Ajinkya Ghadge &mdash; Senior Manager of Software Engineering (Payments), Expedia; builder of PulseRoute. In Mumbai until late November 2026 and available to meet in person.</p>
+  <p>MandateOS is a working name. Nothing on this page is an offer of a regulated service; MandateOS moves no money and holds no licence, because its design requires none. Execution, when live, stays with licensed partners.</p>
+</footer>
+</div>
+
+<script>
+document.querySelectorAll("[data-copy]").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    var text = btn.getAttribute("data-copy");
+    function done() { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, done);
+    } else {
+      var ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta); done();
+    }
+  });
+});
+</script>
+</body>
+</html>
